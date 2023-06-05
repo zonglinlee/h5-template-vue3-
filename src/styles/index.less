@@ -1,11 +1,12 @@
-@import './variables.less';
+@import "./variables.less";
 
 body {
   height: 100%;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
+    Microsoft YaHei, Arial, sans-serif;
   color: var(--van-text-color);
   background-color: var(--color-background-2);
 }
@@ -25,4 +26,25 @@ a:hover {
   cursor: pointer;
   color: inherit;
   text-decoration: none;
+}
+
+// commom css
+.page-wrapper {
+  overflow-x: hidden;
+  overflow-y: auto !important;
+}
+.active-category {
+  background: url("../assets/images/selectbtn.png") 0% 0% / 100% 100% no-repeat !important;
+  color: red !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+}
+
+.gap-margin-left-right{
+  margin-left: 25px;
+  margin-right: 25px;
+}
+.gap-padding-left-right{
+  padding-left: 25px;
+  padding-right: 25px;
 }

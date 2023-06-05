@@ -13,29 +13,26 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
+import homeIcon from "@/assets/images/red/home_icon.png";
+import rankIcon from "@/assets/images/red/rank_icon.png";
 
 const active = ref(0);
 const tabbarData = reactive([
   {
-    icon: "wap-home-o",
-    title: "主页",
+    icon: homeIcon,
+    title: "首页",
     to: {
-      name: "Demo"
+      name: "Home"
     }
   },
   {
-    icon: "gem-o",
-    title: "工具",
+    icon: rankIcon,
+    title: "排行榜",
     to: {
-      name: "Tools"
-    }
-  },
-  {
-    icon: "user-o",
-    title: "关于",
-    to: {
-      name: "About"
+      name: "Ranks"
     }
   }
 ]);
 </script>
+
+<style lang="less" scoped></style>

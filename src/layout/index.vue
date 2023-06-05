@@ -4,16 +4,30 @@ import NavBar from "@/components/NavBar/index.vue";
 import { useCachedViewStoreHook } from "@/store/modules/cachedView";
 import { useDarkMode } from "@/hooks/useToggleDarkMode";
 import { computed } from "vue";
+import type { ConfigProviderThemeVars } from "vant";
+import { ref } from "vue";
 
 const cachedViews = computed(() => {
   return useCachedViewStoreHook().cachedViewList;
 });
+const customThemeVars: ConfigProviderThemeVars = {
+  tabbarBackground: "#a30000",
+  tabbarItemActiveBackground: "#a30000",
+  tabbarItemTextColor: "#FFFFFF",
+  tabbarItemActiveColor: "#FFFFFF",
+  tabbarHeight: "66px"
+};
+
+const showNavBar = ref(false);
 </script>
 
 <template>
   <div class="app-wrapper">
-    <van-config-provider :theme="useDarkMode() ? 'dark' : 'light'">
-      <nav-bar />
+    <van-config-provider
+      :theme-vars="customThemeVars"
+      :theme="useDarkMode() ? 'dark' : 'light'"
+    >
+      <nav-bar v-if="showNavBar" />
       <router-view v-slot="{ Component }">
         <keep-alive :include="cachedViews">
           <component :is="Component" />

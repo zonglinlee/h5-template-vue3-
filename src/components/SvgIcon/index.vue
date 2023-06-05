@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" name="SvgIcon">
 import { isExternal } from "@/utils/validate";
 import { computed } from "vue";
 
