@@ -29,36 +29,6 @@ export type wechatUserInfo = {
   country: string;
   sex: number;
 } | null;
-const userInfo: wechatToken = getUserInfo();
-export async function initUserInfo() {
-  // 用户未登录过
-  if (!userInfo) {
-    openWechatAccessPage();
-  } else {
-    try {
-      // const result = await validateToken(
-      //   tokenInfo!.access_token,
-      //   tokenInfo!.openid
-      // );
-      // const errcode = result.data.errcode;
-      // if (errcode === 0) {
-      //   // accesstoken 有效
-      // } else if (errcode === 40003) {
-      //   const newToken = await refreshToken(tokenInfo!.refresh_token);
-      //   saveTokenInfo(newToken.data);
-      //   const { access_token, openid } = newToken.data;
-      //   const userData = await getUserInfoFromWechat(access_token, openid);
-      //   saveUserInfo(userData.data);
-      // } else {
-      //   console.error(result);
-      // }
-      const userData = await getUserInfoFromCallbackServer(userInfo.openid);
-      saveUserInfo(userData as wechatUserInfo);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-}
 
 export function saveTokenInfo(data: wechatToken) {
   window.localStorage.setItem(TOKEN_INFO, JSON.stringify(data));
@@ -115,3 +85,9 @@ export function getUserInfoFromWechat(ACCESS_TOKEN: string, OPENID: string) {
   const url = `https://api.weixin.qq.com/sns/userinfo?access_token=${ACCESS_TOKEN}&openid=${OPENID}&lang=zh_CN`;
   return axios.get(url);
 }
+
+export const isWeChatEnv = () => {
+  //判断是否是微信
+  const ua = navigator.userAgent.toLowerCase();
+  return ua.match(/MicroMessenger/i) == "micromessenger";
+};

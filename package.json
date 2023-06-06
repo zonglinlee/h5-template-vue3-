@@ -1,5 +1,5 @@
 {
-  "name": "vue3-h5-template",
+  "name": "最美货车司机",
   "homepage": "https://yulimchen.github.io/vue3-h5-template/",
   "version": "0.5.4",
   "license": "MIT",
@@ -24,6 +24,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@vueuse/core": "^9.1.0",
     "axios": "^1.2.6",
     "js-cookie": "^3.0.5",
     "normalize.css": "^8.0.1",

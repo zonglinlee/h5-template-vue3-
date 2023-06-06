@@ -1,24 +1,76 @@
 <script setup lang="ts" name="Home">
-import { initUserInfo } from "@/utils/wechat";
+import LoadMore from "@/components/LoadMore/LoadMore.vue";
 import { useRoute } from "vue-router";
+import { ref } from "vue";
+import { unref } from "vue";
 const route = useRoute();
-if (route.query.code) {
-  try {
-    // const userInfoData = await sendAuthCodeToCallbackServer(route.query.code);
-    // saveUserInfo(userInfoData as wechatUserInfo);
-  } catch (err) {
-    console.error(err);
-  }
-} else {
-  initUserInfo();
-}
+type rankType = {
+  no: number;
+  avatar: string;
+  name: string;
+  company: string;
+  voteNum: number;
+  id: number;
+};
+const itemInit: rankType = {
+  no: 1,
+  avatar: "",
+  name: "张三李四",
+  company: "~~张三李四运输有限责任公司~~",
+  voteNum: 55,
+  id: 1
+};
+let defaultRankList = Array.from<rankType>({ length: 10 }).fill({
+  ...itemInit
+});
+defaultRankList = defaultRankList.map((item: any, index) => {
+  const newItem = { ...item };
+  newItem.id = index + 1;
+  newItem.voteNum = 123 * (index + 1);
+  newItem.name = "张三李四" + index;
+  return newItem;
+});
+const loadingData = ref(false);
+const pageData = ref({ pageNo: 1, pageSize: 10, total: 100 });
+const rankList = ref(defaultRankList);
+const getRankList = async () => {
+  console.log("load more");
+  if (loadingData.value) return;
+  loadingData.value = true;
+  const { pageNo, pageSize } = unref(pageData);
+  pageData.value.pageNo += 1;
+  const increment = pageNo * pageSize;
+  let newArr = new Array(10).fill({
+    no: 1,
+    avatar: "",
+    name: "张三李四",
+    company: "~~张三李四运输有限责任公司~~",
+    voteNum: 55,
+    id: 1
+  });
+  newArr = newArr.map((item, index) => {
+    const newItem = { ...item };
+    newItem.id = index + 1 + increment;
+    newItem.voteNum = 123 * (index + 1) + increment;
+    newItem.name = "张三李四" + (increment + index);
+    return newItem;
+  });
+  const delay = new Promise<void>(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, 1000);
+  });
+  await delay;
+  rankList.value = [...rankList.value, ...newArr];
+  loadingData.value = false;
+};
 </script>
 
 <template>
   <div class="page-wrapper">
     <!-- 司机列表 -->
-    <div class="gap-margin-left-right driver-card-wrapper">
-      <div class="driver-card">
+    <div class="gap-margin-left-right card-wrapper-outer driver-card-wrapper">
+      <div class="driver-card card-wrapper-inner">
         <div class="card-padding">
           <!-- 排行说明 -->
           <div class="title-container">
@@ -43,44 +95,40 @@ if (route.query.code) {
             <span class="col2" style="text-align: left">参与选手</span>
             <span class="col3">投票数</span>
           </div>
-          <div class="item-content rank-item" v-for="item in 12" :key="item">
-            <span class="col1">{{ item }}</span>
+          <div
+            class="item-content rank-item"
+            v-for="item in rankList"
+            :key="item.id"
+          >
+            <span class="col1">{{ item.id }}</span>
             <div class="col2 detail">
               <img src="../../assets/images/red/pic.png" alt="" srcset="" />
               <div class="name-no">
-                <div class="no">{{ item * 2 }}号</div>
-                <div class="name">张三{{ item }}</div>
+                <div class="no">{{ item.id }}号</div>
+                <div class="name">{{ item.name }}</div>
               </div>
             </div>
-            <span class="col3">{{ item * 456 }}</span>
+            <span class="col3">{{ item.voteNum }}</span>
           </div>
         </div>
       </div>
     </div>
+    <LoadMore
+      v-if="rankList.length < pageData.total"
+      @load-more="getRankList"
+    />
   </div>
 </template>
 
 <style lang="less" scoped>
-.page-wrapper {
-  background: url("../../assets/images/red/top_bg.png") 0% 0% / 100% 100%, red;
-  width: 100%;
-  height: 1963px;
-}
-
 .driver-card-wrapper {
-  margin-top: 310px;
-  // margin-bottom: 20px;
-  height: 508px;
-  overflow: hidden;
+  margin-top: 325px;
   .driver-card {
-    background: url("../../assets/images/red/rank_card.png") 0% 0% / 100% 100%;
-    padding-bottom: 11px;
+    padding-bottom: 5px;
     padding-top: 8px;
     .card-padding {
-      padding: 0 20px;
+      padding: 0 4px;
       margin-bottom: 10px;
-      height: 493px;
-      overflow-y: auto;
       .title-container {
         height: 72px;
         display: flex;
@@ -96,6 +144,7 @@ if (route.query.code) {
           .left {
             flex-grow: 0;
             flex-shrink: 0;
+            padding-left: 15px;
           }
           .right {
             flex-grow: 1;
