@@ -41,12 +41,13 @@ export function getTokenInfo() {
 
 export function saveUserInfo(data: wechatUserInfo) {
   // window.localStorage.setItem(USER_INFO, JSON.stringify(data));
-  Cookie.set(USER_INFO, data, { expires: 7 });
+  Cookie.set(USER_INFO, JSON.stringify(data), { expires: 7 });
 }
 export function getUserInfo() {
   // const userInfo = window.localStorage.getItem(USER_INFO);
-  const userInfo = Cookie.get(USER_INFO);
-  if (userInfo) return userInfo;
+  const userInfo = Cookie.get(USER_INFO) || "";
+  const _userInfo: wechatUserInfo = JSON.parse(userInfo);
+  if (_userInfo) return _userInfo;
   return null;
 }
 
@@ -89,5 +90,5 @@ export function getUserInfoFromWechat(ACCESS_TOKEN: string, OPENID: string) {
 export const isWeChatEnv = () => {
   //判断是否是微信
   const ua = navigator.userAgent.toLowerCase();
-  return ua.match(/MicroMessenger/i) == "micromessenger";
+  return ua.match(/MicroMessenger/i);
 };

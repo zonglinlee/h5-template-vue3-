@@ -37,6 +37,7 @@
   "devDependencies": {
     "@commitlint/config-conventional": "^17.4.4",
     "@rushstack/eslint-patch": "^1.1.4",
+    "@types/js-cookie": "^3.0.3",
     "@types/node": "^18.11.12",
     "@types/nprogress": "^0.2.0",
     "@typescript-eslint/parser": "^5.49.0",

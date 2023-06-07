@@ -31,7 +31,7 @@ defaultRankList = defaultRankList.map((item: any, index) => {
   return newItem;
 });
 const loadingData = ref(false);
-const pageData = ref({ pageNo: 1, pageSize: 10, total: 100 });
+const pageData = ref({ pageNo: 1, pageSize: 10, total: 32 });
 const rankList = ref(defaultRankList);
 const getRankList = async () => {
   console.log("load more");

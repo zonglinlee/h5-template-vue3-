@@ -15,7 +15,7 @@ const customThemeVars: ConfigProviderThemeVars = {
   tabbarItemActiveBackground: "#a30000",
   tabbarItemTextColor: "#FFFFFF",
   tabbarItemActiveColor: "#FFFFFF",
-  tabbarHeight: "66px"
+  tabbarHeight: "18vw"
 };
 
 const showNavBar = ref(false);

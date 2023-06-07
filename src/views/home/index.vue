@@ -42,7 +42,7 @@ defaultDriverLists = defaultDriverLists.map((item, index) => {
   return newItem;
 });
 
-const pageData = ref({ pageNo: 1, pageSize: 10, total: 100 });
+const pageData = ref({ pageNo: 1, pageSize: 10, total: 35 });
 const driverLists = ref(defaultDriverLists);
 const loadingData = ref(false);
 const getDriverList = async () => {

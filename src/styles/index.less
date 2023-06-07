@@ -30,15 +30,15 @@ a:hover {
 
 // commom css
 .page-wrapper {
-  overflow-x: hidden;
-  overflow-y: auto !important;
-}
-
-.page-wrapper {
   background: url("../assets/images/red/top_bg_clip.png") 0% 0% / contain
       no-repeat,
     #e62212;
   width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll !important;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 30px;
 }
 
 .gap-margin-left-right {
@@ -59,7 +59,7 @@ a:hover {
   );
   box-shadow: 0px 20px 30px 0px rgb(135, 34, 8);
   padding: 5px;
-  margin-bottom: 30px;
+  // margin-bottom: 30px;
 }
 .card-wrapper-inner {
   border-radius: 30px;
