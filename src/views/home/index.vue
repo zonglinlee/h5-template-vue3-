@@ -1,20 +1,25 @@
 <script setup lang="ts" name="Home">
 import introductionBg from "@/assets/images/red/introduction_bg.png";
-import type { wechatUserInfo } from "@/utils/wechat";
+import type { wechatUserInfo, signatureInfo } from "@/utils/wechat";
 import LoadMore from "@/components/LoadMore/LoadMore.vue";
 import {
   saveUserInfo,
   sendAuthCodeToCallbackServer,
   openWechatAccessPage,
   getUserInfo,
-  isWeChatEnv
+  initWechatSdk,
+  configWX,
+  isWeChatEnv,
+  isPtInPoly
 } from "@/utils/wechat";
+import { coorJf, coorXq } from "@/utils/geoCoors";
 import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { showDialog } from "vant";
 import "vant/es/dialog/style";
+import { onBeforeMount } from "vue";
+import { watch } from "vue";
 const router = useRouter();
-const route = useRoute();
 const keyword = ref("");
 const searchKeyword = () => {};
 type driverType = {
@@ -85,7 +90,26 @@ const goDetailPage = (driver: driverType) => {
     }
   });
 };
-const voteForDriver = (driver: driverType) => {
+const { jWeixin: WX } = window;
+const wxReady = ref(false);
+onBeforeMount(async () => {
+  const res = await initWechatSdk(location.href);
+  configWX(res as signatureInfo, wxReady);
+});
+watch(wxReady, val => {
+  if (val) {
+    WX.updateAppMessageShareData({
+      title: "投票H5首页", // 分享标题
+      desc: "最美货车司机投票App", // 分享描述
+      link: "https://21df-61-133-217-141.ngrok-free.app/#/home", // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+      imgUrl: "https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF", // 分享图标
+      success: function () {
+        console.log("分享连接设置成功");
+      }
+    });
+  }
+});
+const voteForDriver = async (driver: driverType) => {
   const flag = isWeChatEnv();
   if (!flag) {
     showDialog({
@@ -96,19 +120,73 @@ const voteForDriver = (driver: driverType) => {
     });
     return;
   }
-  if (route.query.code) {
-    try {
-      // const userInfoData = await sendAuthCodeToCallbackServer(route.query.code);
-      // saveUserInfo(userInfoData as wechatUserInfo);
-    } catch (err) {
-      console.error(err);
+
+  // let hash = location.hash;
+  // if (hash) {
+  //   const arr = hash.split("?");
+  //   const search = arr[1];
+  //   maps = search.split("&").reduce((acc: any, item) => {
+  //     const arr = item.split("=");
+  //     acc[arr[0]] = acc[1];
+  //     return acc;
+  //   }, {});
+  // }
+  const getLocation = (userInfoData: wechatUserInfo) => {
+    WX.getLocation({
+      type: "wgs84", // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+      success: function (res: any) {
+        console.log("res", res);
+        const latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+        const longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+        const speed = res.speed; // 速度，以米/每秒计
+        const accuracy = res.accuracy; // 位置精度
+        //  do actual vote logic
+        const inPosition = isPtInPoly(longitude, latitude, coorXq);
+        const posMsg = inPosition ? "在兴庆区" : "不在兴庆区";
+        showDialog({
+          title: "个人信息",
+          message:
+            userInfoData!.nickname +
+            `| 纬度:${latitude} | | 经度:${longitude} || 速度:${speed} || 位置精度:${accuracy} || ${posMsg}`
+        }).then(() => {
+          WX.openLocation({
+            latitude, // 纬度，浮点数，范围为90 ~ -90
+            longitude, // 经度，浮点数，范围为180 ~ -180。
+            name: "unknow", // 位置名
+            address: "unknow", // 地址详情说明
+            scale: 1, // 地图缩放级别,整型值,范围从1~28。默认为最大
+            infoUrl: location.href // 在查看位置界面底部显示的超链接,可点击跳转
+          });
+        });
+      }
+    });
+  };
+  const userInfo: wechatUserInfo = getUserInfo();
+
+  if (!userInfo) {
+    let maps: { code?: string } = {};
+    let search = location.search;
+    if (search && search.startsWith("?")) {
+      search = search.substring(1);
+      maps = search.split("&").reduce((acc: any, item) => {
+        const arr = item.split("=");
+        acc[arr[0]] = arr[1];
+        return acc;
+      }, {});
+    }
+    if (!maps.code) {
+      openWechatAccessPage();
+    } else {
+      try {
+        const userInfoData = await sendAuthCodeToCallbackServer(maps.code);
+        saveUserInfo(userInfoData as wechatUserInfo);
+        getLocation(userInfoData as wechatUserInfo);
+      } catch (err) {
+        console.error(err);
+      }
     }
   } else {
-    const userInfo: wechatUserInfo = getUserInfo();
-    if (!userInfo) {
-      openWechatAccessPage();
-    }
-    console.log(driver.id, userInfo?.openid);
+    getLocation(userInfo);
   }
 };
 </script>
